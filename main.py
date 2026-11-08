@@ -41,5 +41,18 @@ print("Dodano książek:", len(ksiazki))
 print("Liczba książek w bazie:", liczba)
 
 
+#zadanie 3
+
+cursor.execute("""
+    SELECT rok_wydania, tytul, autor
+    FROM ksiazki
+    ORDER BY rok_wydania DESC
+""")
+
+wyniki = cursor.fetchall()
+
+for rok, tytul, autor in wyniki:
+    print(f"{rok} | {tytul} | {autor}")
+
 conn.commit()
 conn.close()
