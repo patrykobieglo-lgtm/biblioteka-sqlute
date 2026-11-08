@@ -155,5 +155,44 @@ for ksiazka in wyniki:
         f"{ksiazka['lat_temu']} lat temu"
     )
 
+#zadanie 8
+
+def zmien_rok(conn, id_ksiazki, nowy_rok) -> bool:
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE ksiazki
+        SET rok_wydania = ?
+        WHERE id = ?
+    """, (nowy_rok, id_ksiazki))
+
+    # Kolejność parametrów odpowiada kolejności znaków ?
+    # Pierwszy ? to nowy rok, drugi ? to ID książki.
+
+    if cursor.rowcount > 0:
+        conn.commit()
+        return True
+
+    return False
+
+
+# Test 1 – zmiana istniejącej książki
+if zmien_rok(conn, 1, 1887):
+    cursor.execute(
+        "SELECT * FROM ksiazki WHERE id = ?",
+        (1,)
+    )
+
+    ksiazka = cursor.fetchone()
+
+    print("Zmieniono:", tuple(ksiazka))
+
+
+# Test 2 – próba zmiany nieistniejącej książki
+if not zmien_rok(conn, 42, 2000):
+    print("Nie znaleziono książki o id 42.")
+
+
+
 conn.commit()
 conn.close()
