@@ -54,5 +54,24 @@ wyniki = cursor.fetchall()
 for rok, tytul, autor in wyniki:
     print(f"{rok} | {tytul} | {autor}")
 
+    #zadanie 4
+
+autor = input("Podaj autora: ")
+
+cursor.execute("""
+    SELECT rok_wydania, tytul, autor
+    FROM ksiazki
+    WHERE autor = ?
+    ORDER BY rok_wydania
+""", (autor,))
+
+wyniki = cursor.fetchall()
+
+if wyniki:
+    for rok, tytul, autor in wyniki:
+        print(f"{rok} | {tytul} | {autor}")
+else:
+    print("Nie znaleziono książek tego autora.")
+
 conn.commit()
 conn.close()
