@@ -100,5 +100,29 @@ if cursor.rowcount > 0:
 else:
     print(f"Nie ma książki o id {id_ksiazki}.")
 
+    #zadanie 6
+
+def szukaj_tytulow(conn, fraza) -> list[str]:
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT tytul
+        FROM ksiazki
+        WHERE tytul LIKE ?
+        ORDER BY tytul
+    """, (f"%{fraza}%",))
+
+    wyniki = cursor.fetchall()
+
+    return [wiersz[0] for wiersz in wyniki]
+
+
+# Test
+print("\nWyszukiwanie tytułów:")
+
+print("is:", szukaj_tytulow(conn, "is"))
+print("IS:", szukaj_tytulow(conn, "IS"))
+print("xyz:", szukaj_tytulow(conn, "xyz"))
+
 conn.commit()
 conn.close()
