@@ -73,5 +73,32 @@ if wyniki:
 else:
     print("Nie znaleziono książek tego autora.")
 
+
+#zadanie 5
+
+cursor.execute("SELECT id, tytul FROM ksiazki")
+ksiazki = cursor.fetchall()
+
+print("\nDostępne książki:")
+
+for id, tytul in ksiazki:
+    print(f"{id}: {tytul}")
+
+# Zapytaj o ID
+id_ksiazki = int(input("Podaj ID książki do usunięcia: "))
+
+# Usuń książkę
+cursor.execute(
+    "DELETE FROM ksiazki WHERE id = ?",
+    (id_ksiazki,)
+)
+
+# Sprawdź wynik
+if cursor.rowcount > 0:
+    conn.commit()
+    print(f"Usunięto książkę o id {id_ksiazki}.")
+else:
+    print(f"Nie ma książki o id {id_ksiazki}.")
+
 conn.commit()
 conn.close()
