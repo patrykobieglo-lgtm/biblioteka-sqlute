@@ -124,5 +124,36 @@ print("is:", szukaj_tytulow(conn, "is"))
 print("IS:", szukaj_tytulow(conn, "IS"))
 print("xyz:", szukaj_tytulow(conn, "xyz"))
 
+#zadanie 7
+
+from datetime import date
+
+# Ustawienie dostępu do kolumn po nazwach
+conn.row_factory = sqlite3.Row
+cursor = conn.cursor()
+
+# Pobranie aktualnego roku
+aktualny_rok = date.today().year
+
+# Jedno zapytanie SQL
+cursor.execute("""
+    SELECT
+        tytul,
+        rok_wydania AS rok,
+        ? - rok_wydania AS lat_temu
+    FROM ksiazki
+    ORDER BY rok_wydania DESC
+    LIMIT 3
+""", (aktualny_rok,))
+
+wyniki = cursor.fetchall()
+
+for ksiazka in wyniki:
+    print(
+        f"{ksiazka['rok']} | "
+        f"{ksiazka['tytul']} | "
+        f"{ksiazka['lat_temu']} lat temu"
+    )
+
 conn.commit()
 conn.close()
