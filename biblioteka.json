@@ -1,0 +1,56 @@
+[
+  {
+    "id": 9,
+    "tytul": "Pan Tadeusz",
+    "autor": "Adam Mickiewicz",
+    "rok_wydania": 1834
+  },
+  {
+    "id": 1,
+    "tytul": "Lalka",
+    "autor": "Bolesław Prus",
+    "rok_wydania": 1887
+  },
+  {
+    "id": 7,
+    "tytul": "Diuna",
+    "autor": "Frank Herbert",
+    "rok_wydania": 1965
+  },
+  {
+    "id": 8,
+    "tytul": "W pustyni i w puszczy",
+    "autor": "Henryk Sienkiewicz",
+    "rok_wydania": 1911
+  },
+  {
+    "id": 6,
+    "tytul": "Hobbit",
+    "autor": "J.R.R. Tolkien",
+    "rok_wydania": 1937
+  },
+  {
+    "id": 10,
+    "tytul": "Treny",
+    "autor": "Jan Kochanowski",
+    "rok_wydania": 1584
+  },
+  {
+    "id": 5,
+    "tytul": "Cyberiada",
+    "autor": "Stanisław Lem",
+    "rok_wydania": 1965
+  },
+  {
+    "id": 4,
+    "tytul": "Solaris",
+    "autor": "Stanisław Lem",
+    "rok_wydania": 1961
+  },
+  {
+    "id": 3,
+    "tytul": "Ferdydurke",
+    "autor": "Witold Gombrowicz",
+    "rok_wydania": 1937
+  }
+]

@@ -229,3 +229,173 @@ print(f"Zaimportowano książek: {len(poprawne_ksiazki)}")
 
 conn.commit()
 conn.close()
+
+#zadanie 10
+
+import sqlite3
+
+# 1. Tworzymy bazę tylko w pamięci RAM
+conn10 = sqlite3.connect(":memory:")
+cursor10 = conn10.cursor()
+
+# 2. Tworzymy tabelę katalog
+cursor10.execute("""
+CREATE TABLE katalog (
+    tytul TEXT,
+    ukryta INTEGER
+)
+""")
+
+# 3. Dodajemy książki
+ksiazki = [
+    ("Lalka", 0),
+    ("Quo vadis", 0),
+    ("Solaris", 0),
+    ("Rękopis – tylko dla redakcji", 1)
+]
+
+cursor10.executemany(
+    "INSERT INTO katalog VALUES (?, ?)",
+    ksiazki
+)
+
+conn10.commit()
+
+
+# 4. Wersja podatna na SQL Injection
+def szukaj_podatnie(fraza):
+    zapytanie = f"""
+    SELECT tytul FROM katalog
+    WHERE ukryta = 0 AND tytul LIKE '%{fraza}%'
+    """
+    cursor10.execute(zapytanie)
+    return cursor10.fetchall()
+
+
+# 5. Wersja bezpieczna - parametr ?
+def szukaj_bezpiecznie(fraza):
+    cursor10.execute("""
+        SELECT tytul FROM katalog
+        WHERE ukryta = 0 AND tytul LIKE ?
+    """, (f"%{fraza}%",))
+
+    return cursor10.fetchall()
+
+
+# 6. Test SQL Injection
+fraza = "' OR 1=1 --"
+
+print("Wersja podatna:")
+print(szukaj_podatnie(fraza))
+
+print("\nWersja bezpieczna:")
+print(szukaj_bezpiecznie(fraza))
+
+conn10.close()
+
+
+#zadanie 11
+
+import sqlite3
+
+# Łączymy się z bazą biblioteki
+conn11 = sqlite3.connect("biblioteka.db")
+cursor11 = conn11.cursor()
+
+
+# Funkcja dodająca paczkę książek
+def dodaj_paczke(conn, ksiazki):
+    with conn:
+        conn.executemany("""
+            INSERT INTO ksiazki (tytul, autor, rok_wydania)
+            VALUES (?, ?, ?)
+        """, ksiazki)
+
+
+try:
+    # Sprawdzamy liczbę książek przed operacją
+    liczba_przed = cursor11.execute(
+        "SELECT COUNT(*) FROM ksiazki"
+    ).fetchone()[0]
+
+    print(f"Książek przed: {liczba_przed}")
+
+    # Pierwsza paczka - trzecia książka ma błędny tytuł
+    paczka = [
+        ("W pustyni i w puszczy", "Henryk Sienkiewicz", 1911),
+        ("Pan Tadeusz", "Adam Mickiewicz", 1834),
+        (None, "Jan Kochanowski", 1584)
+    ]
+
+    try:
+        dodaj_paczke(conn11, paczka)
+
+    except sqlite3.IntegrityError as blad:
+        print(f"Błąd: {blad} - nie dodano żadnej książki")
+
+    # Poprawiamy trzecią książkę
+    paczka[2] = ("Treny", "Jan Kochanowski", 1584)
+
+    # Ponawiamy dodawanie
+    dodaj_paczke(conn11, paczka)
+
+    print("Poprawiona paczka została dodana.")
+
+    # Sprawdzamy liczbę książek po operacji
+    liczba_po = cursor11.execute(
+        "SELECT COUNT(*) FROM ksiazki"
+    ).fetchone()[0]
+
+    print(f"Książek po: {liczba_po}")
+finally:
+        conn11.close()
+        print("Połączenie z bazą zostało zamknięte.")
+
+#zadanie 12
+
+import json
+
+conn = sqlite3.connect("biblioteka.db")
+                       
+# Ustawiamy sposób odczytu rekordów
+try:
+    conn.row_factory = sqlite3.Row
+
+        # Pobieramy książki posortowane po autorze i tytule
+    cursor = conn.cursor()
+
+    cursor.execute("""
+                SELECT id, tytul, autor, rok_wydania
+                FROM ksiazki
+                ORDER BY autor, tytul
+            """)
+
+    wiersze = cursor.fetchall()
+
+            # Zamieniamy rekordy SQLite.Row na słowniki
+    ksiazki_json = [dict(wiersz) for wiersz in wiersze]
+
+            # Zapisujemy do pliku JSON
+    with open("biblioteka.json", "w", encoding="utf-8") as plik:
+                json.dump(
+                    ksiazki_json,
+                    plik,
+                    ensure_ascii=False,
+                    indent=2
+                )
+
+    print(f"Zapisano {len(ksiazki_json)} książek do biblioteka.json")
+
+            # Wczytujemy plik JSON
+    with open("biblioteka.json", "r", encoding="utf-8") as plik:
+                odczytane_ksiazki = json.load(plik)
+
+    # Sprawdzamy liczbę rekordów w bazie
+    cursor.execute("SELECT COUNT(*) FROM ksiazki")
+    liczba_w_bazie = cursor.fetchone()[0]
+
+            # Porównujemy wyniki
+    print("Zgodność z bazą:", len(odczytane_ksiazki) == liczba_w_bazie)
+finally:
+    conn11.close()
+    print("Połączenie z bazą zostało zamknięte.")
