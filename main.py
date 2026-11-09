@@ -192,7 +192,40 @@ if zmien_rok(conn, 1, 1887):
 if not zmien_rok(conn, 42, 2000):
     print("Nie znaleziono książki o id 42.")
 
+#zadanie 9
 
+import csv
+
+poprawne_ksiazki = []
+
+with open("nowe_ksiazki.csv", "r", encoding="utf-8", newline="") as plik:
+    czytnik = csv.DictReader(plik, delimiter=";")
+
+    for wiersz in czytnik:
+        try:
+            rok = int(wiersz["rok_wydania"])
+
+            poprawne_ksiazki.append((
+                wiersz["tytul"],
+                wiersz["autor"],
+                rok
+            ))
+
+        except ValueError:
+            print(
+                f"Pominięto „{wiersz['tytul']}”: "
+                f"niepoprawny rok „{wiersz['rok_wydania']}”"
+            )
+
+# Dodanie poprawnych książek jednym executemany()
+cursor.executemany("""
+    INSERT INTO ksiazki (tytul, autor, rok_wydania)
+    VALUES (?, ?, ?)
+""", poprawne_ksiazki)
+
+conn.commit()
+
+print(f"Zaimportowano książek: {len(poprawne_ksiazki)}")
 
 conn.commit()
 conn.close()
