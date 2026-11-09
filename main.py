@@ -399,3 +399,54 @@ try:
 finally:
     conn11.close()
     print("Połączenie z bazą zostało zamknięte.")
+
+    #zadanie 13
+
+    # zadanie 13
+import sqlite3
+
+# Otwieramy połączenie z bazą
+conn = sqlite3.connect("biblioteka.db")
+cursor = conn.cursor()
+
+# Dozwolone kolumny sortowania
+dozwolone_sortowanie = ["tytul", "autor", "rok_wydania"]
+
+# Pobieramy wybór użytkownika
+sortowanie = input(
+    "Sortuj po (tytul/autor/rok_wydania): "
+).strip()
+
+# Sprawdzamy, czy kolumna jest dozwolona
+if sortowanie not in dozwolone_sortowanie:
+    print("Nieznana kolumna – sortuję po tytule.")
+    sortowanie = "tytul"
+
+# Pobieramy numer strony
+strona = int(input("Strona: "))
+
+# Liczba książek na stronie
+limit = 2
+
+# Obliczamy przesunięcie
+offset = (strona - 1) * limit
+
+# Pobieramy książki z bazy
+cursor.execute(f"""
+    SELECT rok_wydania, tytul
+    FROM ksiazki
+    ORDER BY {sortowanie}
+    LIMIT ? OFFSET ?
+""", (limit, offset))
+
+ksiazki = cursor.fetchall()
+
+# Wyświetlamy wyniki
+if ksiazki:
+    for rok, tytul in ksiazki:
+        print(f"{rok} | {tytul}")
+else:
+    print("Ta strona jest pusta.")
+
+# Zamykamy połączenie
+conn.close()
